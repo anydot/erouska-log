@@ -7,6 +7,12 @@ datadir="erouska"
 mkdir -p $datadir
 
 curl "$baseurl/erouska/index.txt" | while read file; do
-    outfile=$datadir/`basename $file`
-    test -e $outfile || curl -o $outfile $baseurl/$file || rm -f $outfile
+    outfile=$datadir/`basename $file .zip`.json
+
+    if [ ! -e $outfile ]; then
+        tmp=`mktemp`
+        curl $baseurl/$file > $tmp
+        unzip -p $tmp "export.bin" | ./parser/exposure_to_json.py > $outfile 
+        rm -f $tmp
+    fi
 done

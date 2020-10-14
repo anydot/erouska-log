@@ -8,13 +8,20 @@ on:
 
 jobs:
   scheduled:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - name: Check out this repo
       uses: actions/checkout@v2
+
+    - name: Install deps and build protoscript
+      run: |-
+        sudo apt install -y protobuf-compiler python3-protobuf
+        protoc --python_out=. parser/exposure.proto
+
     - name: Fetch latest data
       run: |-
         ./scrape.sh
+
     - name: Commit and push if it changed
       run: |-
         git config user.name "Automated"
